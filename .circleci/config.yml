@@ -32,7 +32,7 @@ jobs:
       - checkout
       - run:
           name: "Print hello"
-          command: "echo Hello"
+          command: "echo Hello $MY_CUSTOM_VAR"
 
   print_world:
     docker:
