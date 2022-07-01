@@ -24,33 +24,39 @@ jobs:
           name: "Say hello"
           command: "echo Hello, World!"
 
-  print_hello:
+  save_hello_world_output:
     docker:
       - image: circleci/node:13.8.0
 
     steps:
       - checkout
       - run:
-          name: "Print hello"
-          command: "echo Hello $MY_CUSTOM_VAR"
+          name: "save hello world"
+          command: echo "text to output here" > output.txt
+      - persist_to_workspace:
+          root: workspace
+          paths:
+            - echo-output
 
-  print_world:
+  downstream:
     docker:
       - image: circleci/node:13.8.0
-
     steps:
-      - checkout
-      - run:
-          name: "Print world"
-          command: "echo World"
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /tmp/workspace
+
+      - run: |
+          if [[ `cat /tmp/workspace/echo-output` == "Hello, world!" ]]; then
+            echo "It worked!";
+          else
+            echo "Nope!"; exit 1
+          fi
 
 
-# Invoke jobs via workflows
-# See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   welcome:
     jobs:
       - welcome/run
-      - print_hello
-      - print_world:
-          requires: [print_hello]
+      - save_hello_world_output
+      - downstream
