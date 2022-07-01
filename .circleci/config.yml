@@ -11,6 +11,12 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - print_pipeline_id
+      - run: return 1       
+      
+      - run:
+          name: Failure alert
+          command: echo "FAILED PLEASE"
+          when: on_fail
 
 workflows:
   my_workflow:
